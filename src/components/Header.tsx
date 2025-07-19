@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar, Users, Trophy, Menu, X } from "lucide-react";
 
@@ -44,8 +45,12 @@ const Header = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" className="font-medium">Sign In</Button>
-            <Button variant="hero" className="font-semibold px-6">Get Started</Button>
+            <Button variant="ghost" className="font-medium" asChild>
+              <Link to="/login">Sign In</Link>
+            </Button>
+            <Button variant="hero" className="font-semibold px-6" asChild>
+              <Link to="/register">Get Started</Link>
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -74,8 +79,12 @@ const Header = () => {
                 </a>
               ))}
               <div className="flex flex-col space-y-3 pt-6 border-t border-border/50">
-                <Button variant="ghost" className="justify-start font-medium">Sign In</Button>
-                <Button variant="hero" className="justify-start font-semibold">Get Started</Button>
+                <Button variant="ghost" className="justify-start font-medium" asChild>
+                  <Link to="/login">Sign In</Link>
+                </Button>
+                <Button variant="hero" className="justify-start font-semibold" asChild>
+                  <Link to="/register">Get Started</Link>
+                </Button>
               </div>
             </nav>
           </div>

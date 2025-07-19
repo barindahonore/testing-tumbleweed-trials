@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,10 +8,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Authentication logic will be implemented with Supabase integration
+    
+    // Demo login logic - redirect based on email domain
+    if (email.includes("student")) {
+      navigate("/student-dashboard");
+    } else if (email.includes("judge")) {
+      navigate("/judge-dashboard");
+    } else if (email.includes("admin")) {
+      navigate("/admin-dashboard");
+    } else {
+      // Default to student dashboard
+      navigate("/student-dashboard");
+    }
+    
     console.log("Login attempt:", { email, password });
   };
 
