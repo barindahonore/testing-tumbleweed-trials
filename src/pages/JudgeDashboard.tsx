@@ -43,7 +43,7 @@ import {
 
 // Sidebar Navigation Component
 function JudgeSidebar() {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const navigate = useNavigate();
   
   const menuItems = [
@@ -59,15 +59,17 @@ function JudgeSidebar() {
     navigate("/");
   };
 
+  const isCollapsed = state === "collapsed";
+
   return (
-    <Sidebar className={collapsed ? "w-16" : "w-64"} collapsible>
+    <Sidebar className={isCollapsed ? "w-16" : "w-64"} collapsible="icon">
       <SidebarContent className="bg-card border-r border-border">
         <div className="p-4 border-b border-border">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
               <Scale className="w-4 h-4 text-white" />
             </div>
-            {!collapsed && (
+            {!isCollapsed && (
               <div>
                 <h2 className="text-lg font-semibold text-foreground">EduEvents</h2>
                 <p className="text-xs text-muted-foreground">Judge Portal</p>
@@ -77,7 +79,7 @@ function JudgeSidebar() {
         </div>
 
         <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel className={isCollapsed ? "sr-only" : ""}>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
@@ -95,7 +97,7 @@ function JudgeSidebar() {
                       }
                     >
                       <item.icon className="w-5 h-5" />
-                      {!collapsed && <span className="font-medium">{item.title}</span>}
+                      {!isCollapsed && <span className="font-medium">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -105,7 +107,7 @@ function JudgeSidebar() {
         </SidebarGroup>
 
         <div className="mt-auto p-4 border-t border-border">
-          {!collapsed ? (
+          {!isCollapsed ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <Avatar className="w-8 h-8">
