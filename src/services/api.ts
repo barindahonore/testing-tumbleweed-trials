@@ -36,4 +36,101 @@ api.interceptors.response.use(
   }
 );
 
+// Dashboard data types
+export interface StudentDashboardData {
+  upcomingRegistrations: Array<{
+    id: string;
+    userId: string;
+    eventId: string;
+    status: string;
+    registeredAt: string;
+    event: {
+      id: string;
+      title: string;
+      description: string;
+      startTime: string;
+      endTime: string;
+      location: string;
+      status: string;
+    };
+  }>;
+  activeTeams: Array<{
+    id: string;
+    name: string;
+    invitationCode: string;
+    competitionId: string;
+    competition: {
+      event: {
+        title: string;
+        endTime: string;
+      };
+    };
+  }>;
+  recentResults: Array<{
+    id: string;
+    finalScore: number;
+    team: {
+      name: string;
+    };
+    competition: {
+      event: {
+        title: string;
+      };
+    };
+  }>;
+}
+
+export interface JudgeDashboardData {
+  competitionsToJudge: Array<{
+    id: string;
+    title: string;
+    description: string;
+    startTime: string;
+    endTime: string;
+    location: string;
+    status: string;
+    submissionsAwaitingEvaluation: number;
+  }>;
+}
+
+export interface AdminDashboardData {
+  platformStats: {
+    totalUsers: number;
+    totalRegistrations: number;
+    totalCompetitions: number;
+    eventsByStatus: {
+      published: number;
+      in_progress: number;
+      completed: number;
+      draft: number;
+    };
+  };
+  recentActivity: {
+    recentEvents: Array<{
+      id: string;
+      title: string;
+      status: string;
+      createdAt: string;
+    }>;
+    recentUsers: Array<{
+      id: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+      createdAt: string;
+      role: {
+        name: string;
+      };
+    }>;
+  };
+}
+
+export type DashboardData = StudentDashboardData | JudgeDashboardData | AdminDashboardData;
+
+// API function to get dashboard data
+export const getDashboardData = async (): Promise<DashboardData> => {
+  const response = await api.get('/dashboard');
+  return response.data.data;
+};
+
 export default api;
