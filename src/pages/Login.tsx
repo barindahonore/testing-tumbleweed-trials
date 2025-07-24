@@ -1,40 +1,35 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Mail, Lock, Trophy, ArrowRight, Users, Calendar, Award } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/student-dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate loading delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Demo login logic - redirect based on email domain
-    if (email.includes("student")) {
-      navigate("/student-dashboard");
-    } else if (email.includes("judge")) {
-      navigate("/judge-dashboard");
-    } else if (email.includes("admin")) {
-      navigate("/admin-dashboard");
-    } else {
-      // Default to student dashboard
-      navigate("/student-dashboard");
+    try {
+      await login(email, password);
+    } catch (error) {
+      // Error handling is done in the AuthContext
+      console.error('Login failed:', error);
     }
-    
-    setIsLoading(false);
-    console.log("Login attempt:", { email, password });
   };
 
   return (

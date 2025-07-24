@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Mail, Lock, User, Trophy, ArrowRight, BookOpen, Target, Shield } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -13,24 +14,32 @@ const Register = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const { register, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/student-dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!acceptTerms) return;
     
-    setIsLoading(true);
-    
-    // Simulate loading delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Demo registration logic - redirect to student dashboard by default
-    navigate("/student-dashboard");
-    
-    setIsLoading(false);
-    console.log("Registration attempt:", { email, password, firstName, lastName });
+    try {
+      await register({
+        firstName,
+        lastName,
+        email,
+        password,
+      });
+    } catch (error) {
+      // Error handling is done in the AuthContext
+      console.error('Registration failed:', error);
+    }
   };
 
   const passwordStrength = () => {
