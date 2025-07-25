@@ -8,9 +8,6 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import StudentDashboard from "./pages/StudentDashboard";
-import JudgeDashboard from "./pages/JudgeDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
@@ -39,7 +36,7 @@ const App = () => (
               path="/student-dashboard" 
               element={
                 <ProtectedRoute requiredRole="STUDENT">
-                  <StudentDashboard />
+                  <Dashboard />
                 </ProtectedRoute>
               } 
             />
@@ -47,7 +44,7 @@ const App = () => (
               path="/judge-dashboard" 
               element={
                 <ProtectedRoute requiredRole="JUDGE">
-                  <JudgeDashboard />
+                  <Dashboard />
                 </ProtectedRoute>
               } 
             />
@@ -55,7 +52,7 @@ const App = () => (
               path="/admin-dashboard" 
               element={
                 <ProtectedRoute requiredRole="ADMIN">
-                  <AdminDashboard />
+                  <Dashboard />
                 </ProtectedRoute>
               } 
             />
