@@ -8,7 +8,9 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
+import StudentDashboard from "./pages/StudentDashboard";
+import JudgeDashboard from "./pages/JudgeDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,18 +27,10 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
               path="/student-dashboard" 
               element={
                 <ProtectedRoute requiredRole="STUDENT">
-                  <Dashboard />
+                  <StudentDashboard />
                 </ProtectedRoute>
               } 
             />
@@ -44,7 +38,7 @@ const App = () => (
               path="/judge-dashboard" 
               element={
                 <ProtectedRoute requiredRole="JUDGE">
-                  <Dashboard />
+                  <JudgeDashboard />
                 </ProtectedRoute>
               } 
             />
@@ -52,7 +46,7 @@ const App = () => (
               path="/admin-dashboard" 
               element={
                 <ProtectedRoute requiredRole="ADMIN">
-                  <Dashboard />
+                  <AdminDashboard />
                 </ProtectedRoute>
               } 
             />
