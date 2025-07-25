@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,7 +9,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import StudentDashboard from "./pages/StudentDashboard";
+import StudentLayout from "./components/layouts/StudentLayout";
+import StudentDashboard from "./pages/student/DashboardPage";
 import JudgeDashboard from "./pages/JudgeDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -27,13 +29,15 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route 
-              path="/student-dashboard" 
+              path="/student/*" 
               element={
                 <ProtectedRoute requiredRole="STUDENT">
-                  <StudentDashboard />
+                  <StudentLayout />
                 </ProtectedRoute>
               } 
-            />
+            >
+              <Route path="dashboard" element={<StudentDashboard />} />
+            </Route>
             <Route 
               path="/judge-dashboard" 
               element={
