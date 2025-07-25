@@ -50,7 +50,7 @@ export const getUserProfile = async (userId: string) => {
 };
 
 export const updateUserProfile = async (userId: string, data: { firstName: string; lastName: string }) => {
-  const response = await api.patch(`/users/${userId}`, data);
+  const response = await api.patch(`/users/me`, data);
   return response.data.data;
 };
 
