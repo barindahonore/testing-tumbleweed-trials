@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
@@ -107,7 +108,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             description: "Welcome back!",
           });
 
-          // Redirect based on role
+          // Redirect based on role - Fixed the student redirect
           switch (userData.role) {
             case 'ADMIN':
               navigate('/admin-dashboard');
@@ -117,7 +118,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               break;
             case 'STUDENT':
             default:
-              navigate('/student-dashboard');
+              navigate('/student/dashboard');
               break;
           }
         }
@@ -162,7 +163,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             description: "Welcome to EduEvents Hub!",
           });
 
-          // Redirect based on role
+          // Redirect based on role - Fixed the student redirect
           switch (fullUserData.role) {
             case 'ADMIN':
               navigate('/admin-dashboard');
@@ -172,7 +173,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               break;
             case 'STUDENT':
             default:
-              navigate('/student-dashboard');
+              navigate('/student/dashboard');
               break;
           }
         }

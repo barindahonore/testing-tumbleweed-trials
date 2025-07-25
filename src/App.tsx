@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import StudentLayout from "./components/layouts/StudentLayout";
 import StudentDashboard from "./pages/student/DashboardPage";
+import ProfilePage from "./pages/student/ProfilePage";
 import JudgeDashboard from "./pages/JudgeDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -37,6 +38,7 @@ const App = () => (
               } 
             >
               <Route path="dashboard" element={<StudentDashboard />} />
+              <Route path="profile" element={<ProfilePage />} />
             </Route>
             <Route 
               path="/judge-dashboard" 

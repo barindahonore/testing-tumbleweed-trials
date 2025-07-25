@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 // Create axios instance with base configuration
@@ -35,5 +36,22 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Dashboard API
+export const getDashboardData = async () => {
+  const response = await api.get('/dashboard');
+  return response.data.data;
+};
+
+// User Profile API
+export const getUserProfile = async (userId: string) => {
+  const response = await api.get(`/users/${userId}`);
+  return response.data.data;
+};
+
+export const updateUserProfile = async (userId: string, data: { firstName: string; lastName: string }) => {
+  const response = await api.patch(`/users/${userId}`, data);
+  return response.data.data;
+};
 
 export default api;

@@ -115,13 +115,13 @@ function StudentSidebar() {
                   <p className="text-xs text-muted-foreground">{user?.email}</p>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <Button variant="ghost" size="sm" onClick={handleLogout} title="Logout">
                 <LogOut className="w-4 h-4" />
               </Button>
             </div>
           ) : (
             <div className="flex justify-center">
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <Button variant="ghost" size="sm" onClick={handleLogout} title="Logout">
                 <LogOut className="w-4 h-4" />
               </Button>
             </div>
