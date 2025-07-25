@@ -53,9 +53,9 @@ function StudentSidebar() {
 
   return (
     <Sidebar className={isCollapsed ? "w-16" : "w-64"} collapsible="icon">
-      <SidebarContent className="bg-card border-r border-border">
+      <SidebarContent className="bg-card">
         {/* Logo Section */}
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <Trophy className="w-4 h-4 text-white" />
@@ -99,7 +99,7 @@ function StudentSidebar() {
         </SidebarGroup>
 
         {/* User Section */}
-        <div className="mt-auto p-4 border-t border-border">
+        <div className="mt-auto p-4 border-t">
           {!isCollapsed ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -140,7 +140,7 @@ const StudentLayout = () => {
         
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Top Header */}
-          <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6">
+          <header className="h-16 bg-card border-b flex items-center justify-between px-6">
             <div className="flex items-center space-x-4">
               <SidebarTrigger className="lg:hidden" />
               <div>
