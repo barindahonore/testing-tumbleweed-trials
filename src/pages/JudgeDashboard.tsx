@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { 
   Scale, 
@@ -40,6 +41,22 @@ import {
   SidebarTrigger,
   useSidebar 
 } from "@/components/ui/sidebar";
+import { useToast } from '@/hooks/use-toast';
+import api from '@/services/api';
+
+interface Competition {
+  id: string;
+  title: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  submissionsAwaitingEvaluation: number;
+}
+
+interface JudgeDashboardData {
+  competitionsToJudge: Competition[];
+}
 
 // Sidebar Navigation Component
 function JudgeSidebar() {
@@ -136,93 +153,109 @@ function JudgeSidebar() {
 }
 
 const JudgeDashboard = () => {
-  const pendingReviews = [
-    {
-      id: 1,
-      studentName: "Sarah Johnson",
-      eventTitle: "Leadership Essay Competition",
-      submittedDate: "2024-01-28",
-      deadline: "2024-02-05",
-      type: "Essay",
-      status: "pending",
-      priority: "high"
-    },
-    {
-      id: 2,
-      studentName: "Michael Chen",
-      eventTitle: "Innovation Project Showcase",
-      submittedDate: "2024-01-30",
-      deadline: "2024-02-10",
-      type: "Project",
-      status: "pending",
-      priority: "medium"
-    },
-    {
-      id: 3,
-      studentName: "Emily Davis",
-      eventTitle: "Entrepreneurship Pitch",
-      submittedDate: "2024-02-01",
-      deadline: "2024-02-08",
-      type: "Presentation",
-      status: "in_progress",
-      priority: "high"
-    }
-  ];
+  const [dashboardData, setDashboardData] = useState<JudgeDashboardData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const completedReviews = [
-    {
-      id: 4,
-      studentName: "Alex Rivera",
-      eventTitle: "Global Leadership Summit",
-      reviewedDate: "2024-01-25",
-      score: 92,
-      type: "Essay",
-      feedback: "Exceptional analysis and leadership insights"
-    },
-    {
-      id: 5,
-      studentName: "Sophie Wilson",
-      eventTitle: "Innovation Workshop",
-      reviewedDate: "2024-01-23",
-      score: 88,
-      type: "Project",
-      feedback: "Creative solution with strong technical execution"
-    }
-  ];
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await api.get('/dashboard');
+        
+        if (response.data.success) {
+          setDashboardData(response.data.data);
+        } else {
+          throw new Error(response.data.message || 'Failed to fetch dashboard data');
+        }
+      } catch (err: any) {
+        const errorMessage = err.response?.data?.message || 'Failed to load dashboard data';
+        setError(errorMessage);
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const judgeStats = {
-    totalReviews: 47,
-    pendingReviews: 3,
-    averageScore: 89.5,
-    reviewsThisMonth: 12
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high": return "bg-red-50 text-red-700 border-red-200";
-      case "medium": return "bg-orange-50 text-orange-700 border-orange-200";
-      case "low": return "bg-green-50 text-green-700 border-green-200";
-      default: return "bg-muted text-muted-foreground";
-    }
-  };
+    fetchDashboardData();
+  }, [toast]);
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending": return "bg-orange-50 text-orange-700 border-orange-200";
-      case "in_progress": return "bg-blue-50 text-blue-700 border-blue-200";
-      case "completed": return "bg-green-50 text-green-700 border-green-200";
+    switch (status.toLowerCase()) {
+      case "published": return "bg-green-50 text-green-700 border-green-200";
+      case "draft": return "bg-gray-50 text-gray-700 border-gray-200";
+      case "in_progress": return "bg-yellow-50 text-yellow-700 border-yellow-200";
+      case "completed": return "bg-blue-50 text-blue-700 border-blue-200";
       default: return "bg-muted text-muted-foreground";
     }
   };
 
   const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "pending": return <AlertCircle className="w-4 h-4" />;
+    switch (status.toLowerCase()) {
+      case "published": return <Calendar className="w-4 h-4" />;
       case "in_progress": return <Clock className="w-4 h-4" />;
       case "completed": return <CheckCircle className="w-4 h-4" />;
-      default: return <Clock className="w-4 h-4" />;
+      default: return <AlertCircle className="w-4 h-4" />;
     }
   };
+
+  if (isLoading) {
+    return (
+      <SidebarProvider>
+        <div className="min-h-screen w-full flex bg-background">
+          <JudgeSidebar />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex items-center justify-center h-96">
+              <div className="text-center space-y-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                <p className="text-muted-foreground">Loading dashboard...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
+  if (error || !dashboardData) {
+    return (
+      <SidebarProvider>
+        <div className="min-h-screen w-full flex bg-background">
+          <JudgeSidebar />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex items-center justify-center h-96">
+              <div className="text-center space-y-4 max-w-md">
+                <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto">
+                  <span className="text-2xl">⚠️</span>
+                </div>
+                <h2 className="text-xl font-bold text-foreground">Dashboard Error</h2>
+                <p className="text-muted-foreground">{error || 'Unable to load dashboard data'}</p>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
+  const { competitionsToJudge } = dashboardData;
+  const totalCompetitions = competitionsToJudge.length;
+  const pendingEvaluations = competitionsToJudge.reduce((sum, comp) => sum + comp.submissionsAwaitingEvaluation, 0);
+  const activeCompetitions = competitionsToJudge.filter(comp => comp.status === 'IN_PROGRESS').length;
+  const completedReviews = 47; // This would come from API in real implementation
 
   return (
     <SidebarProvider>
@@ -242,7 +275,9 @@ const JudgeDashboard = () => {
             <div className="flex items-center space-x-3">
               <Button variant="ghost" size="sm" className="relative">
                 <Bell className="w-4 h-4" />
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-orange-500 rounded-full"></span>
+                {pendingEvaluations > 0 && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-orange-500 rounded-full"></span>
+                )}
               </Button>
               <Button variant="ghost" size="sm">
                 <Settings className="w-4 h-4" />
@@ -258,12 +293,12 @@ const JudgeDashboard = () => {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Total Reviews</p>
-                        <p className="text-2xl font-bold text-foreground">{judgeStats.totalReviews}</p>
-                        <p className="text-xs text-blue-600 font-medium">All time</p>
+                        <p className="text-sm font-medium text-muted-foreground">Total Competitions</p>
+                        <p className="text-2xl font-bold text-foreground">{totalCompetitions}</p>
+                        <p className="text-xs text-blue-600 font-medium">To judge</p>
                       </div>
                       <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center dark:bg-blue-900/30">
-                        <FileText className="w-5 h-5 text-blue-600" />
+                        <Trophy className="w-5 h-5 text-blue-600" />
                       </div>
                     </div>
                   </CardContent>
@@ -273,8 +308,8 @@ const JudgeDashboard = () => {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Pending Reviews</p>
-                        <p className="text-2xl font-bold text-foreground">{judgeStats.pendingReviews}</p>
+                        <p className="text-sm font-medium text-muted-foreground">Pending Evaluations</p>
+                        <p className="text-2xl font-bold text-foreground">{pendingEvaluations}</p>
                         <p className="text-xs text-orange-600 font-medium">Needs attention</p>
                       </div>
                       <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center dark:bg-orange-900/30">
@@ -288,12 +323,12 @@ const JudgeDashboard = () => {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Average Score</p>
-                        <p className="text-2xl font-bold text-foreground">{judgeStats.averageScore}</p>
-                        <p className="text-xs text-green-600 font-medium">High quality</p>
+                        <p className="text-sm font-medium text-muted-foreground">Active Competitions</p>
+                        <p className="text-2xl font-bold text-foreground">{activeCompetitions}</p>
+                        <p className="text-xs text-green-600 font-medium">In progress</p>
                       </div>
                       <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center dark:bg-green-900/30">
-                        <Star className="w-5 h-5 text-green-600" />
+                        <Clock className="w-5 h-5 text-green-600" />
                       </div>
                     </div>
                   </CardContent>
@@ -303,124 +338,105 @@ const JudgeDashboard = () => {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">This Month</p>
-                        <p className="text-2xl font-bold text-foreground">{judgeStats.reviewsThisMonth}</p>
-                        <p className="text-xs text-purple-600 font-medium">80% of goal</p>
+                        <p className="text-sm font-medium text-muted-foreground">Completed Reviews</p>
+                        <p className="text-2xl font-bold text-foreground">{completedReviews}</p>
+                        <p className="text-xs text-purple-600 font-medium">All time</p>
                       </div>
                       <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center dark:bg-purple-900/30">
-                        <Calendar className="w-5 h-5 text-purple-600" />
+                        <CheckCircle className="w-5 h-5 text-purple-600" />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Pending Reviews Priority Section */}
+              {/* Competitions to Judge */}
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="text-lg flex items-center">
-                        <AlertCircle className="w-5 h-5 mr-2 text-orange-500" />
-                        High Priority Reviews
+                        <Trophy className="w-5 h-5 mr-2 text-orange-500" />
+                        Competitions to Judge
                       </CardTitle>
-                      <CardDescription>Submissions with approaching deadlines</CardDescription>
+                      <CardDescription>Your assigned competitions and pending evaluations</CardDescription>
                     </div>
-                    <Badge variant="destructive" className="animate-pulse">
-                      {pendingReviews.filter(r => r.priority === 'high').length} urgent
+                    <Badge variant="secondary" className="animate-pulse">
+                      {pendingEvaluations} pending
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {pendingReviews.filter(review => review.priority === 'high').map((review) => (
-                    <div key={review.id} className="flex items-center justify-between p-4 rounded-lg border border-orange-200 bg-orange-50/50 dark:border-orange-800 dark:bg-orange-900/20">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center dark:bg-orange-900/30">
-                          <FileText className="w-5 h-5 text-orange-600" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-foreground">{review.eventTitle}</p>
-                          <p className="text-sm text-muted-foreground">by {review.studentName}</p>
-                          <div className="flex items-center space-x-3 text-xs text-muted-foreground mt-1">
-                            <span className="flex items-center">
-                              <Clock className="w-3 h-3 mr-1" />
-                              Due: {review.deadline}
-                            </span>
-                            <Badge variant="outline" className="text-xs">{review.type}</Badge>
+                  {competitionsToJudge.length > 0 ? (
+                    competitionsToJudge.map((competition) => (
+                      <div key={competition.id} className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/20 hover:bg-muted/40 transition-colors">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                            {getStatusIcon(competition.status)}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-foreground">{competition.title}</p>
+                            <p className="text-sm text-muted-foreground">{competition.description}</p>
+                            <div className="flex items-center space-x-3 text-xs text-muted-foreground mt-1">
+                              <span className="flex items-center">
+                                <Calendar className="w-3 h-3 mr-1" />
+                                {new Date(competition.startTime).toLocaleDateString()} - {new Date(competition.endTime).toLocaleDateString()}
+                              </span>
+                              <Badge variant="outline" className={getStatusColor(competition.status)}>
+                                {competition.status.toLowerCase().replace('_', ' ')}
+                              </Badge>
+                            </div>
                           </div>
                         </div>
+                        <div className="flex items-center space-x-2">
+                          {competition.submissionsAwaitingEvaluation > 0 && (
+                            <Badge variant="destructive" className="mr-2">
+                              {competition.submissionsAwaitingEvaluation} pending
+                            </Badge>
+                          )}
+                          <Button size="sm" variant="outline">
+                            <Eye className="w-4 h-4 mr-2" />
+                            View
+                          </Button>
+                          <Button size="sm" disabled={competition.submissionsAwaitingEvaluation === 0}>
+                            Start Judging
+                            <ChevronRight className="w-4 h-4 ml-1" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Button size="sm" variant="outline">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Review
-                        </Button>
-                        <Button size="sm">
-                          Start Review
-                          <ChevronRight className="w-4 h-4 ml-1" />
-                        </Button>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <Trophy className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">No competitions assigned yet</p>
                     </div>
-                  ))}
+                  )}
                 </CardContent>
               </Card>
 
-              {/* Recent Activity & Analytics */}
+              {/* Recent Activity & Progress */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center">
-                      <CheckCircle className="w-5 h-5 mr-2 text-green-500" />
-                      Recent Reviews
-                    </CardTitle>
-                    <CardDescription>Your latest completed evaluations</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {completedReviews.slice(0, 3).map((review) => (
-                      <div key={review.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/20">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center dark:bg-green-900/30">
-                            <CheckCircle className="w-4 h-4 text-green-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-sm text-foreground">{review.eventTitle}</p>
-                            <p className="text-xs text-muted-foreground">by {review.studentName}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-primary">{review.score}</p>
-                          <p className="text-xs text-muted-foreground">{review.reviewedDate}</p>
-                        </div>
-                      </div>
-                    ))}
-                    <Button variant="ghost" className="w-full mt-3">
-                      View All Completed
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center">
                       <BarChart3 className="w-5 h-5 mr-2 text-primary" />
-                      Review Progress
+                      Judging Progress
                     </CardTitle>
-                    <CardDescription>Monthly completion tracking</CardDescription>
+                    <CardDescription>Your evaluation progress and stats</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       <div>
                         <div className="flex justify-between text-sm mb-2">
-                          <span>February Progress</span>
-                          <span>12/15 reviews</span>
+                          <span>Overall Progress</span>
+                          <span>{completedReviews}/{completedReviews + pendingEvaluations} evaluations</span>
                         </div>
-                        <Progress value={80} className="h-3" />
+                        <Progress value={(completedReviews / (completedReviews + pendingEvaluations)) * 100} className="h-3" />
                       </div>
                       <div className="grid grid-cols-3 gap-4 pt-4">
                         <div className="text-center">
-                          <p className="text-lg font-bold text-primary">80%</p>
-                          <p className="text-xs text-muted-foreground">Completion</p>
+                          <p className="text-lg font-bold text-primary">{Math.round((completedReviews / (completedReviews + pendingEvaluations)) * 100)}%</p>
+                          <p className="text-xs text-muted-foreground">Completed</p>
                         </div>
                         <div className="text-center">
                           <p className="text-lg font-bold text-green-600">2.5</p>
@@ -432,6 +448,39 @@ const JudgeDashboard = () => {
                         </div>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center">
+                      <Calendar className="w-5 h-5 mr-2 text-primary" />
+                      Recent Activity
+                    </CardTitle>
+                    <CardDescription>Your latest judging activities</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {competitionsToJudge.slice(0, 3).map((competition) => (
+                      <div key={competition.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/20">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                            {getStatusIcon(competition.status)}
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm text-foreground">{competition.title}</p>
+                            <p className="text-xs text-muted-foreground">{competition.status.toLowerCase().replace('_', ' ')}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-primary">{competition.submissionsAwaitingEvaluation}</p>
+                          <p className="text-xs text-muted-foreground">pending</p>
+                        </div>
+                      </div>
+                    ))}
+                    <Button variant="ghost" className="w-full mt-3">
+                      View All Activities
+                      <ChevronRight className="w-4 h-4 ml-2" />
+                    </Button>
                   </CardContent>
                 </Card>
               </div>
