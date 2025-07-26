@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
@@ -108,10 +107,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             description: "Welcome back!",
           });
 
-          // Redirect based on role - Fixed the student redirect
+          // Redirect based on role - Updated admin redirect
           switch (userData.role) {
             case 'ADMIN':
-              navigate('/admin-dashboard');
+              navigate('/admin/dashboard');
               break;
             case 'JUDGE':
               navigate('/judge-dashboard');
@@ -163,10 +162,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             description: "Welcome to EduEvents Hub!",
           });
 
-          // Redirect based on role - Fixed the student redirect
+          // Redirect based on role - Updated admin redirect
           switch (fullUserData.role) {
             case 'ADMIN':
-              navigate('/admin-dashboard');
+              navigate('/admin/dashboard');
               break;
             case 'JUDGE':
               navigate('/judge-dashboard');

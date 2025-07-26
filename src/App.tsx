@@ -13,7 +13,8 @@ import StudentDashboard from "./pages/student/DashboardPage";
 import ProfilePage from "./pages/student/ProfilePage";
 import JudgeDashboard from "./pages/JudgeDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import AdminLayout from "./components/layouts/AdminLayout";
+import DashboardPage from "./pages/admin/DashboardPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,13 +58,15 @@ const App = () => (
               } 
             />
             <Route 
-              path="/admin/dashboard" 
+              path="/admin/*" 
               element={
                 <ProtectedRoute allowedRoles={['ADMIN']}>
-                  <AdminDashboardPage />
+                  <AdminLayout />
                 </ProtectedRoute>
               } 
-            />
+            >
+              <Route path="dashboard" element={<DashboardPage />} />
+            </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
