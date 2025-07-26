@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import StudentDashboard from "./pages/student/DashboardPage";
 import ProfilePage from "./pages/student/ProfilePage";
 import JudgeDashboard from "./pages/JudgeDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,7 +32,7 @@ const App = () => (
             <Route 
               path="/student/*" 
               element={
-                <ProtectedRoute requiredRole="STUDENT">
+                <ProtectedRoute allowedRoles={['STUDENT']}>
                   <StudentLayout />
                 </ProtectedRoute>
               } 
@@ -43,7 +43,7 @@ const App = () => (
             <Route 
               path="/judge-dashboard" 
               element={
-                <ProtectedRoute requiredRole="JUDGE">
+                <ProtectedRoute allowedRoles={['JUDGE']}>
                   <JudgeDashboard />
                 </ProtectedRoute>
               } 
@@ -51,8 +51,16 @@ const App = () => (
             <Route 
               path="/admin-dashboard" 
               element={
-                <ProtectedRoute requiredRole="ADMIN">
+                <ProtectedRoute allowedRoles={['ADMIN']}>
                   <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/dashboard" 
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminDashboardPage />
                 </ProtectedRoute>
               } 
             />

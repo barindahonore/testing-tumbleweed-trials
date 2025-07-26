@@ -1,13 +1,14 @@
+
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: 'STUDENT' | 'JUDGE' | 'ADMIN';
+  allowedRoles?: ('STUDENT' | 'JUDGE' | 'ADMIN')[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
 
   // Show loading spinner while checking authentication
@@ -24,14 +25,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
     return <Navigate to="/login" replace />;
   }
 
-  // Check role-based access if required
-  if (requiredRole && user?.role !== requiredRole) {
+  // Check role-based access if allowedRoles is specified
+  if (allowedRoles && user?.role && !allowedRoles.includes(user.role)) {
     // Redirect to appropriate dashboard based on user role
-    const redirectPath = user?.role === 'ADMIN' 
+    const redirectPath = user.role === 'ADMIN' 
       ? '/admin-dashboard' 
-      : user?.role === 'JUDGE' 
+      : user.role === 'JUDGE' 
       ? '/judge-dashboard' 
-      : '/student-dashboard';
+      : '/student/dashboard';
     
     return <Navigate to={redirectPath} replace />;
   }
